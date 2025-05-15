@@ -9,7 +9,7 @@ import { render } from '@react-email/components';
 import { SESv2Client, SendEmailCommand } from '@aws-sdk/client-sesv2';
 
 // SMTP
-// const transporterSMTP = createTransport({
+// const transporter = createTransport({
 //   host: process.env.SMTP_HOST as string,
 //   port: Number(process.env.SMTP_PORT),
 //   secure: true,
@@ -20,7 +20,7 @@ import { SESv2Client, SendEmailCommand } from '@aws-sdk/client-sesv2';
 // });
 
 // SES
-const ses = new SESv2Client({
+const sesClient = new SESv2Client({
   apiVersion: '2010-12-01',
   region: process.env.AWS_REGION as string,
   credentials: {
@@ -29,8 +29,8 @@ const ses = new SESv2Client({
   },
 });
 
-const transporterSES = createTransport({
-  SES: { ses, SendEmailCommand },
+const transporter = createTransport({
+  SES: { sesClient, SendEmailCommand },
 });
 
 export const sendEmail = async ({
@@ -46,7 +46,7 @@ export const sendEmail = async ({
 }) => {
   const emailHtml = await render(mailHtml);
 
-  await transporterSES.sendMail({
+  await transporter.sendMail({
     from: from,
     to: to,
     subject: subject,

@@ -13,6 +13,7 @@
 
 @theme inline {
   --breakpoint-xl: 70rem;
+  --breakpoint-2xl: 80rem;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

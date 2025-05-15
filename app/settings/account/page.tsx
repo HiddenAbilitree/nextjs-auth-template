@@ -28,10 +28,10 @@ export default async function AuthSettings() {
 
     return currentSession
       ? await db
-        .selectFrom('passkey')
-        .select(['createdAt', 'name'])
-        .where('passkey.userId', '=', currentSession.user.id)
-        .execute()
+          .selectFrom('passkey')
+          .select(['createdAt', 'name'])
+          .where('passkey.userId', '=', currentSession.user.id)
+          .execute()
       : [];
   };
 

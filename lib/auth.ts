@@ -1,6 +1,6 @@
 import { betterAuth } from 'better-auth';
 import { passkey } from 'better-auth/plugins/passkey';
-import { twoFactor } from 'better-auth/plugins';
+import { captcha, magicLink, openAPI, twoFactor } from 'better-auth/plugins';
 import { Pool } from 'pg';
 import { Kysely, PostgresDialect } from 'kysely';
 import { sendEmail } from '@/lib/email';
@@ -10,6 +10,7 @@ import {
   VerifyDeletion,
   VerifyEmailChange,
   VerifyPasswordChange,
+  MagicLinkEmail,
 } from '@/components/email';
 
 const pool = new Pool({
@@ -58,7 +59,27 @@ export const db = new Kysely<Database>({
 // refer to https://www.better-auth.com/docs/basic-usage           //
 // and https://kysely.dev/docs/getting-started?package-manager=bun //
 export const auth = betterAuth({
-  plugins: [passkey(), twoFactor()],
+  plugins: [
+    passkey(),
+    twoFactor(),
+    captcha({
+      provider: process.env.CAPTCHA_PROVIDER as
+        | 'cloudflare-turnstile'
+        | 'google-recaptcha'
+        | 'hcaptcha',
+      secretKey: process.env.CAPTCHA_SECRET_KEY as string,
+    }),
+    openAPI(),
+    magicLink({
+      sendMagicLink: async ({ email, url }) =>
+        sendEmail({
+          mailHtml: MagicLinkEmail({ url }),
+          from: process.env.EMAIL_SENDER as string,
+          to: email,
+          subject: 'Sign In',
+        }),
+    }),
+  ],
 
   emailAndPassword: {
     enabled: true,
@@ -66,7 +87,7 @@ export const auth = betterAuth({
     maxPasswordLength: 1024,
     sendResetPassword: async ({ user, url }) =>
       sendEmail({
-        mailHtml: VerifyPasswordChange({ url: url }),
+        mailHtml: VerifyPasswordChange({ url }),
         from: process.env.EMAIL_SENDER as string,
         to: user.email,
         subject: 'Change Your Password',
@@ -76,7 +97,7 @@ export const auth = betterAuth({
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) =>
       sendEmail({
-        mailHtml: VerifyEmail({ url: url }),
+        mailHtml: VerifyEmail({ url }),
         from: process.env.EMAIL_SENDER as string,
         to: user.email,
         subject: 'Verify Your Email',
@@ -101,7 +122,7 @@ export const auth = betterAuth({
       },
       sendDeleteAccountVerification: async ({ user, url }) =>
         sendEmail({
-          mailHtml: VerifyDeletion({ url: url }),
+          mailHtml: VerifyDeletion({ url }),
           from: process.env.EMAIL_SENDER as string,
           to: user.email,
           subject: 'Verify Account Deletion',
@@ -126,11 +147,15 @@ export const auth = betterAuth({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
+    discord: {
+      clientId: process.env.DISCORD_CLIENT_ID as string,
+      clientSecret: process.env.DISCORD_CLIENT_SECRET as string,
+    },
   },
 
   database: pool,
 
   appName: 'Nextjs Auth Template',
 
-  rateLimit: { enabled: true },
+  rateLimit: { enabled: true, max: 15, window: 100 },
 });

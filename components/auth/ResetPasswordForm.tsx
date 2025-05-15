@@ -24,23 +24,27 @@ export const ResetPasswordForm = () => {
 
   const onSubmit = async (values: typeof ResetPasswordFormSchema.infer) => {
     const toastId = toast.loading('Resetting password...');
-    const { error } = await authClient.resetPassword({
-      newPassword: values.password,
-      token,
-    });
-
-    if (error) {
-      toast.error('Error', {
-        id: toastId,
-        description: error.message,
-      });
-    } else {
-      toast.success('Password Reset Successful', {
-        id: toastId,
-        description: 'You can now sign in with your new password!',
-      });
-      router.push('/auth/signin');
-    }
+    await authClient.resetPassword(
+      {
+        newPassword: values.password,
+        token,
+      },
+      {
+        onSuccess: () => {
+          toast.success('Password Reset Successful', {
+            id: toastId,
+            description: 'You can now sign in with your new password!',
+          });
+          router.push('/auth/signin');
+        },
+        onError: (context) => {
+          toast.error('Error', {
+            id: toastId,
+            description: context.error.message,
+          });
+        },
+      },
+    );
   };
 
   const form = useForm<typeof ResetPasswordFormSchema.infer>({

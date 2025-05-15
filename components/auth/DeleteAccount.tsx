@@ -32,7 +32,10 @@ export const DeleteAccount = () => (
         <DialogClose asChild>
           <Button
             variant='destructive'
-            onClick={() =>
+            onClick={() => {
+              const toastId = toast.loading(
+                'Sending Account Deletion Email...',
+              );
               void authClient.deleteUser(
                 {
                   callbackURL: '/auth/signup',
@@ -42,14 +45,15 @@ export const DeleteAccount = () => (
                     toast.success('Email Sent', {
                       description:
                         'Please check your email to verify account deletion.',
+                      id: toastId,
                     });
                   },
                   onError: (context) => {
-                    toast.error(context.error.message);
+                    toast.error(context.error.message, { id: toastId });
                   },
                 },
-              )
-            }
+              );
+            }}
           >
             Delete Account
           </Button>

@@ -39,6 +39,7 @@ export const TwoFactorFormSchema = type({
 });
 
 export const ForgotPasswordFormSchema = type({ email: Email });
+export const MagicLinkFormSchema = type({ email: Email });
 
 export const ResetPasswordFormSchema = type({
   password: NewPassword,

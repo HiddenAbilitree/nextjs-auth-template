@@ -20,6 +20,7 @@ import { useForm } from 'react-hook-form';
 import { SignInFormSchema } from '@/lib/schemas/auth';
 import { Separator } from '@/components/ui/separator';
 import { useRouter } from 'next/navigation';
+import { DiscordOAuth, GoogleOAuth } from '@/components/auth/oauth';
 
 export const SignInForm = () => {
   const router = useRouter();
@@ -88,7 +89,7 @@ export const SignInForm = () => {
       <form
         tabIndex={0}
         onSubmit={form.handleSubmit(onSubmit)}
-        className='flex w-100 flex-col gap-5 rounded-md border bg-card p-4 shadow-sm'
+        className='flex w-100 flex-col gap-4 rounded-md border bg-card p-4 shadow-sm'
       >
         <div className='flex w-full flex-col gap-3.5'>
           <h1 className='w-full text-xl font-semibold'>Welcome Back</h1>
@@ -102,6 +103,7 @@ export const SignInForm = () => {
               <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input
+                  tabIndex={10}
                   placeholder='example@acme.com'
                   autoComplete='username webauthn'
                   {...field}
@@ -127,6 +129,7 @@ export const SignInForm = () => {
               </FormLabel>
               <FormControl>
                 <Input
+                  tabIndex={10}
                   placeholder='••••••••'
                   type='password'
                   autoComplete='current-password webauthn'
@@ -137,41 +140,29 @@ export const SignInForm = () => {
             </FormItem>
           )}
         />
-        <Button type='submit'>Sign In</Button>
-        <Button
-          type='button'
-          onClick={async () => {
-            await authClient.signIn.social({
-              provider: 'google',
-            });
-          }}
-          variant='white'
+        <Button type='submit' tabIndex={10}>
+          Sign In
+        </Button>
+        <GoogleOAuth />
+        <DiscordOAuth />
+        <Link
+          href='/auth/magic-link'
+          className="inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-md border bg-white px-4 py-2 text-sm font-medium whitespace-nowrap text-black shadow-xs transition-all outline-none hover:cursor-pointer hover:bg-secondary/80 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 has-[>svg]:px-3 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:hover:bg-primary/90 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
         >
-          Sign In with Google{' '}
+          Sign in with Magic Link
           <svg
+            className='size-5'
             xmlns='http://www.w3.org/2000/svg'
-            width='31.27'
+            width='32'
             height='32'
-            viewBox='0 0 256 262'
+            viewBox='0 0 24 24'
           >
             <path
-              fill='#4285F4'
-              d='M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622l38.755 30.023l2.685.268c24.659-22.774 38.875-56.282 38.875-96.027'
-            />
-            <path
-              fill='#34A853'
-              d='M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055c-34.523 0-63.824-22.773-74.269-54.25l-1.531.13l-40.298 31.187l-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1'
-            />
-            <path
-              fill='#FBBC05'
-              d='M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82c0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602z'
-            />
-            <path
-              fill='#EB4335'
-              d='M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0C79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251'
+              fill='currentColor'
+              d='M4 20q-.825 0-1.412-.587T2 18V6q0-.825.588-1.412T4 4h16q.825 0 1.413.588T22 6v12q0 .825-.587 1.413T20 20zM20 8l-7.475 4.675q-.125.075-.262.113t-.263.037t-.262-.037t-.263-.113L4 8v10h16zm-8 3l8-5H4zM4 8v.25v-1.475v.025V6v.8v-.012V8.25zv10z'
             />
           </svg>
-        </Button>
+        </Link>
         <span>
           Don{"'"}t have an account? Make one{' '}
           <Link
