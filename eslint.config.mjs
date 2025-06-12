@@ -56,7 +56,6 @@ const eslintConfig = [
         'error',
         {
           cases: {
-            pascalCase: true,
             kebabCase: true,
           },
         },
